@@ -13,3 +13,5 @@
 @media(max-width:520px){.model-controls{padding:0 12px 10px}.model-controls span{max-width:110px;font-size:8px}.connection-underlay{stroke-width:6}.connection-visible{stroke-width:2}}
 
 .layer-controls{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:0 12px 10px;color:#b8d3e8;font-size:11px}.layer-controls label{display:flex;gap:4px;align-items:center}.layer-controls input{accent-color:#81d7ff}
+
+#model-status{font-size:10px;color:#8fabc3;text-align:center;padding:0 15px;min-height:16px}.attribution{text-align:center;font-size:10px;color:#8fabc3;padding:10px 15px 25px}.attribution a{color:#b4dbff}
