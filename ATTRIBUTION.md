@@ -26,6 +26,6 @@ Three.js 0.160.1, MIT license. See THREE-LICENSE.txt. Bundled from the official 
 
 ## Interpretation
 
-The source anatomy is a reference model, not a complete representation of every nerve or tissue. Reading-topic pins and concept-map links are approximate educational annotations, not verified neural pathways. No source-model geometry establishes that a topic appears in Chapters 1–3 of Behave. All book explanations remain student-supplied placeholders.
+The source anatomy is a reference model, not a complete representation of every nerve or tissue. Reading-topic pins and concept-map links are approximate educational annotations, not verified neural pathways. No source-model geometry establishes that a topic appears in Chapters 1–3 of Behave. Reading content now includes clearly labeled paraphrases, supporting biology, and original examples; each entry links to its sources.
 
 Supplemental whole-body nerve branches and reward-network markers are original schematic geometry, not source anatomical meshes.

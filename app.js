@@ -6,6 +6,13 @@ try {
   const saved = JSON.parse(localStorage.getItem(storageKey));
   if (saved?.version === 1 && Array.isArray(saved.nodes) && saved.nodes.length === data.nodes.length && saved.nodes.every((n,i) => n.id === data.nodes[i].id && ['title','chapter','theme','explanation','evidence','citation','interpretation','connectionNote'].every(k=>typeof n[k]==='string'))) data = saved;
 } catch (_) { /* Editing remains usable when storage is unavailable. */ }
+// Upgrade untouched starter fields while preserving the student's saved writing.
+data.nodes.forEach((n,i)=>{const base=window.BEHAVE_CONTENT.nodes[i];
+  const untouched=['explanation','evidence','citation','interpretation','connectionNote'].every(k=>/^\[ADD /.test(n[k]));
+  ['explanation','evidence','citation','interpretation','connectionNote'].forEach(k=>{if(/^\[ADD /.test(n[k]))n[k]=base[k];});
+  if(untouched)n.chapter=base.chapter;
+  if(!n.sources)n.sources=base.sources;
+});
 let selected = data.nodes[1].id, chapter = 'all', theme = 'all', editing = false;
 const fields = ['title','chapter','theme','explanation','evidence','citation','interpretation','connectionNote'];
 const matches = n => (chapter === 'all' || n.chapter === chapter) && (theme === 'all' || n.theme === theme);
@@ -34,6 +41,8 @@ function render() {
   $('selection-title').textContent=n.title;
   ['explanation','evidence','citation','interpretation'].forEach(k=>$(k).textContent=n[k]);
   $('connection-note').textContent=n.connectionNote;
+  $('sources').replaceChildren();
+  (n.sources||[]).forEach(source=>{const a=document.createElement('a');a.textContent=source.title;a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';$('sources').append(a);});
   $('related').replaceChildren();
   data.links.filter(l=>l.includes(selected)).forEach((l,i)=>{const other=data.nodes.find(n=>n.id===l.find(id=>id!==selected));if(other){const b=button((i+1)+' · '+other.title+' ↗',()=>choose(other.id));b.style.borderColor=routeColors[i%routeColors.length];b.addEventListener('mouseenter',()=>drawConnections(other.id));b.addEventListener('mouseleave',()=>drawConnections());b.addEventListener('focus',()=>drawConnections(other.id));b.addEventListener('blur',()=>drawConnections());$('related').append(b);}});
   if(!$('related').childElementCount) $('related').textContent='No connections assigned.';

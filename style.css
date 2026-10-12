@@ -22,3 +22,5 @@
 .highlight-status{color:#9ce8ff;font-size:11px;text-align:center;padding:0 15px;margin:7px 0;min-height:18px}.nerve-note{font-size:9px;text-align:center;color:#8fabc3;margin:4px 10px}
 
 .pin-leader{stroke:#43dfff;stroke-width:1;fill:none;opacity:.8;vector-effect:non-scaling-stroke}
+
+.sources{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.sources a{color:#9edfff;font-size:12px;text-underline-offset:3px}
