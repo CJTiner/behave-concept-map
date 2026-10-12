@@ -38,6 +38,7 @@ function render() {
   data.links.filter(l=>l.includes(selected)).forEach((l,i)=>{const other=data.nodes.find(n=>n.id===l.find(id=>id!==selected));if(other){const b=button((i+1)+' · '+other.title+' ↗',()=>choose(other.id));b.style.borderColor=routeColors[i%routeColors.length];b.addEventListener('mouseenter',()=>drawConnections(other.id));b.addEventListener('mouseleave',()=>drawConnections());b.addEventListener('focus',()=>drawConnections(other.id));b.addEventListener('blur',()=>drawConnections());$('related').append(b);}});
   if(!$('related').childElementCount) $('related').textContent='No connections assigned.';
   fields.forEach(k=>$('editor').elements[k].value=n[k]);
+  window.selectedConcept={id:selected,title:n.title};window.dispatchEvent(new CustomEvent('concept-selected',{detail:window.selectedConcept}));
   $('editor').hidden=!editing;$('reading').hidden=editing;$('edit-toggle').textContent=editing?'Done editing':'Edit content';$('edit-toggle').setAttribute('aria-pressed',editing);
 }
 function filterSelection() {const first=data.nodes.find(matches);if(first&&!matches(data.nodes.find(n=>n.id===selected)))selected=first.id;render();}
@@ -57,17 +58,16 @@ $('export').addEventListener('click',()=>{
 const routeColors=['#d9f5ff','#61ceff','#a69aff','#6bffe0'];
 function drawConnections(only){
   $('connections').replaceChildren();
-  const source=data.nodes.find(n=>n.id===selected),start=position(source);
-  const links=data.links.filter(l=>l.includes(selected)).map(l=>data.nodes.find(n=>n.id===l.find(id=>id!==selected))).filter(Boolean).sort((a,b)=>position(a).y-position(b).y);
-  links.forEach((target,i)=>{
-    if(only&&target.id!==only)return;
-    const end=position(target),cross=(start.x<360)!==(end.x<360);
-    // Every relationship receives its own lane. The dark underlay forms bridges at crossings.
-    let d;
-    if(cross){const lane=35+i*25;d=`M${start.x} ${start.y} C${start.x-35} ${lane} ${end.x+35} ${lane} ${end.x} ${end.y}`;}
-    else {const lane=start.x<360?15+i*28:345-i*28;d=`M${start.x} ${start.y} C${lane} ${start.y} ${lane} ${end.y} ${end.x} ${end.y}`;}
-    const originalIndex=data.links.filter(l=>l.includes(selected)).findIndex(l=>l.includes(target.id));
-    for(const [cls,color] of [['connection-underlay','#020915'],['connection-visible',routeColors[originalIndex%routeColors.length]]]){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',d);p.setAttribute('class',cls);p.style.stroke=color;$('connections').append(p);}
+  if(['frontal','amygdala','hypothalamus','hippocampus','reward'].includes(selected)&&window.anatomyTargets?.[selected]){
+    const a=position(data.nodes.find(n=>n.id===selected)),b=window.anatomyTargets[selected],line=document.createElementNS('http://www.w3.org/2000/svg','path');
+    line.setAttribute('d',`M${a.x} ${a.y} L${b.x} ${b.y}`);line.setAttribute('class','pin-leader');$('connections').append(line);
+  }
+  data.links.forEach(([a,b])=>{
+    if(only&&!([a,b].includes(selected)&&[a,b].includes(only)))return;
+    const source=data.nodes.find(n=>n.id===a),target=data.nodes.find(n=>n.id===b);if(!source||!target)return;
+    const start=position(source),end=position(target),p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M${start.x} ${start.y} Q${(start.x+end.x)/2+30} ${(start.y+end.y)/2-20} ${end.x} ${end.y}`);
+    p.setAttribute('class','connection'+([a,b].includes(selected)?' active':''));$('connections').append(p);
   });
 }
 window.addEventListener('anatomy-rendered',()=>{document.querySelectorAll('.hotspot').forEach(b=>{const n=data.nodes.find(n=>n.id===b.dataset.node),p=position(n);b.style.left=p.x/8+'%';b.style.top=p.y/7.6+'%';});drawConnections();});

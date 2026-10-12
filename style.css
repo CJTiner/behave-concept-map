@@ -15,3 +15,10 @@
 .layer-controls{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;padding:0 12px 10px;color:#b8d3e8;font-size:11px}.layer-controls label{display:flex;gap:4px;align-items:center}.layer-controls input{accent-color:#81d7ff}
 
 #model-status{font-size:10px;color:#8fabc3;text-align:center;padding:0 15px;min-height:16px}.attribution{text-align:center;font-size:10px;color:#8fabc3;padding:10px 15px 25px}.attribution a{color:#b4dbff}
+
+/* Original dashed connection map, with selected relationships illuminated. */
+.connection{fill:none;stroke:#80caff;stroke-width:1.2;stroke-dasharray:5 6;opacity:.4;vector-effect:non-scaling-stroke}
+.connection.active{stroke:#d8f5ff;stroke-width:2;opacity:1;filter:drop-shadow(0 0 3px #65baff)}
+.highlight-status{color:#9ce8ff;font-size:11px;text-align:center;padding:0 15px;margin:7px 0;min-height:18px}.nerve-note{font-size:9px;text-align:center;color:#8fabc3;margin:4px 10px}
+
+.pin-leader{stroke:#43dfff;stroke-width:1;fill:none;opacity:.8;vector-effect:non-scaling-stroke}

@@ -6,7 +6,7 @@ A single-page English 3 project for Chapters 1–3 of Robert M. Sapolsky's *Beha
 
 Live website: https://cjtiner.github.io/behave-concept-map/
 
-For local use, download and extract the project, then open index.html in a current Chrome, Edge, Firefox, or Safari browser with WebGL. Keep **all files together**, including the large model-data.js and bundled three.min.js. No installation or build is needed. Loading the anatomical dataset may take several seconds.
+For local use, download and extract the project, then open index.html in a current Chrome, Edge, Firefox, or Safari browser with WebGL. Keep **all files together**, including model-data.js, region-data.js, and bundled three.min.js. No installation or build is needed. Loading the anatomical dataset may take several seconds.
 
 If your browser restricts local files, run `python3 -m http.server 8000` in this folder and open http://localhost:8000. Stop the server with Ctrl+C.
 
@@ -15,7 +15,8 @@ If your browser restricts local files, run `python3 -m http.server 8000` in this
 - Select a numbered point or its labeled button to open a reading entry.
 - The left/right arrows rotate the actual 3D models; Front view resets them. There is no cursor tilt or automatic rotation.
 - Body, Skeleton, Nerves, and Organs switches control visibility.
-- Connections shows only links for the selected point. Brighter colors, separate routes, and dark outlines make them easier to follow. Hover or keyboard-focus a related-idea button to isolate one line; click it to navigate.
+- Connections restores the original dashed curves, with all links visible and the selected point’s links brighter. Hover or keyboard-focus a related-idea button to isolate one line; click it to navigate.
+- Selecting a brain topic highlights its region in cyan. Inner regions show through a translucent cortex; reward circuitry is an illustrative distributed network.
 - Chapter and theme filters organize reading entries. Pins are spaced apart for smaller screens and side views.
 
 ## Edit the content
@@ -30,7 +31,7 @@ Alternatively, edit the text directly in content.js. Preserve the IDs and JavaSc
 
 ## Anatomy and content boundaries
 
-The models use BodyParts3D reference anatomy, with source attribution and licenses in ATTRIBUTION.md. They are detailed anatomical meshes, not a claim of medical completeness. Nerve coverage is limited to structures present in the source dataset. Reading pins are approximate concept annotations; connections are not verified biological pathways. The brain view is enlarged and separately positioned.
+The models use BodyParts3D reference anatomy, with source attribution and licenses in ATTRIBUTION.md. They are detailed anatomical meshes, not a claim of medical completeness. Source nerve meshes are supplemented with simplified whole-body branches, including arms, hands, torso, legs, and feet. These additional branches are illustrative, not medically complete anatomy. Reading pins are approximate concept annotations; connections are not verified biological pathways. The brain view is enlarged and separately positioned.
 
 The organ reading entries are heart, adrenal glands, eyes, and ears. The external ears are part of the detailed body surface. All chapter/theme assignments are editable starter organization. No quotations have been fabricated.
 
@@ -40,7 +41,7 @@ The organ reading entries are heart, adrenal glands, eyes, and ears. The externa
 - app.js: content selection, filters, editor, connections, and export
 - content.js: student text and conceptual relationships
 - anatomy.js: 3D viewer, materials, lighting, and rotation
-- model-data.js: compressed anatomical mesh data
+- model-data.js / region-data.js: compressed anatomical mesh and highlight data
 - three.min.js / THREE-LICENSE.txt: bundled renderer and license
 - ATTRIBUTION.md: anatomical model sources and licensing
 
