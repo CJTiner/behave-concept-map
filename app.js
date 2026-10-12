@@ -57,3 +57,15 @@ $('export').addEventListener('click',()=>{
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='content.js';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('status').textContent='Downloaded saved entries. Replace content.js in your GitHub repository to share these edits.';
 });
 render();
+
+const drawing = document.querySelector('.drawing');
+const atlas = document.querySelector('.atlas');
+atlas.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect = atlas.getBoundingClientRect();
+  drawing.style.setProperty('--tilt-y', ((event.clientX-rect.left)/rect.width-.5)*9+'deg');
+  drawing.style.setProperty('--tilt-x', -((event.clientY-rect.top)/rect.height-.5)*7+'deg');
+});
+atlas.addEventListener('pointerleave', () => {
+  drawing.style.setProperty('--tilt-x','0deg'); drawing.style.setProperty('--tilt-y','0deg');
+});
