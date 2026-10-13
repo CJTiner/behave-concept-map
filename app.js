@@ -17,12 +17,25 @@ let selected = data.nodes[1].id, chapter = 'all', theme = 'all', editing = false
 const fields = ['title','chapter','theme','explanation','evidence','citation','interpretation','connectionNote'];
 const matches = n => (chapter === 'all' || n.chapter === chapter) && (theme === 'all' || n.theme === theme);
 function button(label, action) { const b=document.createElement('button'); b.type='button'; b.textContent=label; b.addEventListener('click',action); return b; }
-function choose(id) { selected=id; render(); }
+let dirty=false;
+function canLeaveEntry(){
+  if(!dirty)return true;
+  $('status').textContent='You have unsaved edits. Save this entry or discard your edits before switching topics, filters, or leaving the editor.';
+  $('status').scrollIntoView({block:'nearest'});return false;
+}
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+function choose(id) {
+  if(!canLeaveEntry())return;
+  const next=data.nodes.find(n=>n.id===id);
+  if(chapter!=='all'&&next.chapter!==chapter)chapter='all';
+  if(theme!=='all'&&next.theme!==theme)theme='all';
+  selected=id;render();
+}
 const position = n => window.anatomyPositions?.[n.id] || n;
 function render() {
   $('chapters').replaceChildren();
   [['all','All chapters'],['1','01 / Chapter 1'],['2','02 / Chapter 2'],['3','03 / Chapter 3']].forEach(([id,label])=>{
-    const b=button(label,()=>{chapter=id; filterSelection();}); b.setAttribute('aria-pressed',chapter===id); $('chapters').append(b);
+    const b=button(label,()=>{if(!canLeaveEntry())return;chapter=id; filterSelection();}); b.setAttribute('aria-pressed',chapter===id); $('chapters').append(b);
   });
   const themes=[...new Set(data.nodes.map(n=>n.theme))].sort();
   if(theme!=='all'&&!themes.includes(theme)) theme='all';
@@ -37,34 +50,35 @@ function render() {
   drawConnections();
   $('empty').hidden=data.nodes.some(matches);
   const n=data.nodes.find(n=>n.id===selected);
-  $('selection-meta').textContent=`CHAPTER ${n.chapter} / ${n.theme.toUpperCase()}`;
+  $('selection-meta').textContent=(['heart','adrenals'].includes(n.id)?`SUPPORTING BIOLOGY / CHAPTER ${n.chapter} CONNECTION`:`CHAPTER ${n.chapter} / ${n.theme.toUpperCase()}`);
   $('selection-title').textContent=n.title;
   ['explanation','evidence','citation','interpretation'].forEach(k=>$(k).textContent=n[k]);
   $('connection-note').textContent=n.connectionNote;
   $('sources').replaceChildren();
   (n.sources||[]).forEach(source=>{const a=document.createElement('a');a.textContent=source.title;a.href=source.url;a.target='_blank';a.rel='noopener noreferrer';$('sources').append(a);});
   $('related').replaceChildren();
-  data.links.filter(l=>l.includes(selected)).forEach((l,i)=>{const other=data.nodes.find(n=>n.id===l.find(id=>id!==selected));if(other){const b=button((i+1)+' · '+other.title+' ↗',()=>choose(other.id));b.style.borderColor=routeColors[i%routeColors.length];b.addEventListener('mouseenter',()=>drawConnections(other.id));b.addEventListener('mouseleave',()=>drawConnections());b.addEventListener('focus',()=>drawConnections(other.id));b.addEventListener('blur',()=>drawConnections());$('related').append(b);}});
+  data.links.filter(l=>l.includes(selected)).forEach((l,i)=>{const other=data.nodes.find(n=>n.id===l.find(id=>id!==selected));if(other){const b=button((i+1)+' · '+other.title+' ↗',()=>choose(other.id));b.addEventListener('mouseenter',()=>drawConnections(other.id));b.addEventListener('mouseleave',()=>drawConnections());b.addEventListener('focus',()=>drawConnections(other.id));b.addEventListener('blur',()=>drawConnections());$('related').append(b);}});
   if(!$('related').childElementCount) $('related').textContent='No connections assigned.';
   fields.forEach(k=>$('editor').elements[k].value=n[k]);
   window.selectedConcept={id:selected,title:n.title};window.dispatchEvent(new CustomEvent('concept-selected',{detail:window.selectedConcept}));
   $('editor').hidden=!editing;$('reading').hidden=editing;$('edit-toggle').textContent=editing?'Done editing':'Edit content';$('edit-toggle').setAttribute('aria-pressed',editing);
 }
 function filterSelection() {const first=data.nodes.find(matches);if(first&&!matches(data.nodes.find(n=>n.id===selected)))selected=first.id;render();}
-$('themes').addEventListener('change',e=>{theme=e.target.value;filterSelection();});
+$('themes').addEventListener('change',e=>{if(!canLeaveEntry()){e.target.value=theme;return;}theme=e.target.value;filterSelection();});
 $('lines-toggle').addEventListener('change',e=>$('connections').style.display=e.target.checked?'':'none');
-$('edit-toggle').addEventListener('click',()=>{editing=!editing;render();});
+$('edit-toggle').addEventListener('click',()=>{if(!canLeaveEntry())return;editing=!editing;render();});
 // Save before changing selection: explicit save keeps the published content intentional.
-$('editor').addEventListener('input',()=>$('status').textContent='Unsaved edits — save this entry before choosing another point.');
+$('editor').addEventListener('input',()=>{dirty=true;$('status').textContent='Unsaved edits — save this entry before choosing another point.';});
 $('editor').addEventListener('submit',e=>{
-  e.preventDefault();const n=data.nodes.find(n=>n.id===selected);fields.forEach(k=>n[k]=$('editor').elements[k].value.trim());
+  e.preventDefault();dirty=false;const n=data.nodes.find(n=>n.id===selected);fields.forEach(k=>n[k]=$('editor').elements[k].value.trim());
   try {localStorage.setItem(storageKey,JSON.stringify(data));$('status').textContent='Saved in this browser. Download content.js to back up or publish your changes.';} catch (_) {$('status').textContent='Saved for this visit only. Browser storage is unavailable; download content.js now.';} render();
 });
+$('discard').addEventListener('click',()=>{dirty=false;$('status').textContent='Unsaved edits discarded. The saved entry is unchanged.';render();});
 $('export').addEventListener('click',()=>{
+  if(!canLeaveEntry())return;
   const blob=new Blob(['// Student-edited content. Replace content.js in the project with this file.\nwindow.BEHAVE_CONTENT = '+JSON.stringify(data,null,2)+';\n'],{type:'text/javascript'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='content.js';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('status').textContent='Downloaded saved entries. Replace content.js in your GitHub repository to share these edits.';
 });
-const routeColors=['#d9f5ff','#61ceff','#a69aff','#6bffe0'];
 function drawConnections(only){
   $('connections').replaceChildren();
   if(['frontal','amygdala','hypothalamus','hippocampus','reward'].includes(selected)&&window.anatomyTargets?.[selected]){

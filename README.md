@@ -17,13 +17,13 @@ If your browser restricts local files, run `python3 -m http.server 8000` in this
 - Body, Skeleton, Nerves, and Organs switches control visibility.
 - Connections restores the original dashed curves, with all links visible and the selected point’s links brighter. Hover or keyboard-focus a related-idea button to isolate one line; click it to navigate.
 - Selecting a brain topic highlights its region in cyan. Inner regions show through a translucent cortex; reward circuitry is an illustrative distributed network.
-- Chapter and theme filters organize reading entries. Pins are spaced apart for smaller screens and side views.
+- Chapter and theme filters organize reading entries. Pins are spaced apart for smaller screens and side views. Choosing a point outside the current filters returns the relevant filter to All. Use Read selected entry to jump from the map to its explanation.
 
 ## Edit the content
 
 1. Select a point and choose **Edit content**.
 2. Replace its title, chapter, theme, explanation, verified text evidence, citation, interpretation, and connection explanation.
-3. Choose **Save this entry** before switching points. Drafts are saved in this browser/device only.
+3. Choose **Save this entry** before switching points. The editor blocks topic/filter changes while edits are unsaved and warns before leaving the page. Drafts are saved in this browser/device only.
 4. Choose **Download content.js** to export saved entries.
 5. Replace content.js in this repository and commit it to update the published website. Existing browser drafts are preserved and take precedence; use a private browser window to check the new published version without an old draft.
 
